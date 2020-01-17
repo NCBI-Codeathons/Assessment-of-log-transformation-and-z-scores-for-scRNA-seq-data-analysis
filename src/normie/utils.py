@@ -1,8 +1,9 @@
 import os
 import sys
+import scipy
+import glob
 import numpy as np
 import pandas as pd
-import scipy
 from sklearn.linear_model import LinearRegression
 from scipy.stats import zscore
 from glmpca.glmpca import glmpca
