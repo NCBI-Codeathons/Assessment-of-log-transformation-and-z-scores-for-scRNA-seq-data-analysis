@@ -157,7 +157,7 @@ def run_normalization(data_df, method, kwargs=None, r_dir=None):
 			normed_data = pd.DataFrame(normed_data.todense(), index=barcodes, columns=gene_names)
 		elif method == 'sctransform':
 			normed_data = pd.read_feather(r_dir + "_sctransform_normalized").T
-			normed_data = pd.DataFrame(normed_data.todense(), index=barcodes, columns=gene_names)
+			normed_data = pd.DataFrame(normed_data.values, index=barcodes, columns=gene_names)
 		elif method == 'linnorm':
 			normed_data1 = scipy.io.mmread(r_dir + "_linnorm_with_dot_norm.mtx").tocsr().T
 			normed_data2 = scipy.io.mmread(r_dir + "_linnorm.mtx").tocsr().T
