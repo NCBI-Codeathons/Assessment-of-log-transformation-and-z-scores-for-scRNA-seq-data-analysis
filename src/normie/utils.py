@@ -41,6 +41,9 @@ def clean_data(data_df):
 	use_cells = cell_gene_counts.index[cell_gene_counts > 15]
 	data_df = data_df.loc[use_cells, :]
 
+	# remove zero-columns
+	data_df = data_df.loc[:, (data_df > 0).any(axis=0)]
+
 	return data_df
 
 
