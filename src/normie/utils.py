@@ -91,6 +91,7 @@ def run_median_log_lr(counts, pc=0.1):
 	# fit linear regression to 
 	lr = LinearRegression()
 	log_ls = np.log2(ls + pc) - np.log2(pc)
+	log_ls = log_ls.reshape((len(log_ls), 1))
 	lr.fit(log_ls, log_norm_counts)
 	lr_log_norm_counts = log_norm_counts - lr.predict(log_ls)
 
