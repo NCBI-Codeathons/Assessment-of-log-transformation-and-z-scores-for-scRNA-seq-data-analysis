@@ -121,7 +121,7 @@ def run_normalization(data_dir, method, kwargs=None, r_dir=None):
 
 		os.system('RScript {} {} {}'.format(script_path, data_dir, r_dir))
 
-	   barcodes, gene_names = load_indexes(data_dir)
+		barcodes, gene_names = load_indexes(data_dir)
 
 		# load the R output
 		if method == 'scran':
