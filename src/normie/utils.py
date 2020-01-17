@@ -82,6 +82,7 @@ def run_median_log_z(counts, pc=0.1):
 
 
 def run_median_log_lr(counts, pc=0.1):
+	counts = counts.values
 	ls = counts.sum(axis = 1)
 	norm_counts = counts.div(ls, axis=0).mul(np.median(ls), axis=0)
 	log_norm_counts = np.log2(norm_counts + pc) - np.log2(pc)
