@@ -34,8 +34,11 @@ To assess the robustness of a normalization method, we first downsample the coun
 * 10x PBMC 3k
 
 ## Issues
-We had no coffee.
+1) We had no coffee.
+
+2) Lunches would have been great too.
 
 ## Lessons Learned
 Lesson 1: Always a pain to set up environment for various methods.
+
 Lesson 2: Always a pain to run R code from Python and vice-versa.
