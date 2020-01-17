@@ -133,7 +133,7 @@ def corr_lib_size(raw_data, normalized_data):
 	return corr_lib_size, corr_log2_lib_size
 
 
-def downsample_raw_data(raw_data, split_prop, overlap_factor = 0.0, random_state_number = None):
+def downsample_raw_data(raw_data, data_split, overlap_factor = 0.0, random_state_number = None):
 	# convert pandas dataframe to numpy array
 	umis = raw_data.values
 
