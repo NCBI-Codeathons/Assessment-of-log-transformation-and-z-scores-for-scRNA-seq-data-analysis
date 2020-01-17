@@ -13,160 +13,162 @@ from matplotlib import pyplot as plt
 
 
 def correlation_in_gene_groups(raw_data, normalized_data, save_dir=None, nbins = 5):
-    # raw and normalized data must have cells along the rows and genes along the columns
-    mean_before = np.asarray(np.mean(raw_data, axis = 0)).squeeze()
-    log_mean_before = np.log2(np.asarray(np.mean(raw_data, axis = 0)).squeeze())
+	# raw and normalized data must have cells along the rows and genes along the columns
+	mean_before = np.asarray(np.mean(raw_data, axis = 0)).squeeze()
+	log_mean_before = np.log2(np.asarray(np.mean(raw_data, axis = 0)).squeeze())
 
-    mean_after = np.asarray(np.mean(normalized_data, axis = 0)).squeeze()
-    log_mean_after = np.log2(np.asarray(np.mean(normalized_data, axis = 0)).squeeze())
+	mean_after = np.asarray(np.mean(normalized_data, axis = 0)).squeeze()
+	log_mean_after = np.log2(np.asarray(np.mean(normalized_data, axis = 0)).squeeze())
 
-    var_before = np.asarray(np.var(raw_data, axis = 0)).squeeze()
-    log_var_before = np.log2(np.asarray(np.var(raw_data, axis = 0)).squeeze())
+	var_before = np.asarray(np.var(raw_data, axis = 0)).squeeze()
+	log_var_before = np.log2(np.asarray(np.var(raw_data, axis = 0)).squeeze())
 
-    var_after = np.asarray(np.var(normalized_data, axis = 0)).squeeze()
-    log_var_after = np.log2(np.asarray(np.var(normalized_data, axis = 0)).squeeze())
+	var_after = np.asarray(np.var(normalized_data, axis = 0)).squeeze()
+	log_var_after = np.log2(np.asarray(np.var(normalized_data, axis = 0)).squeeze())
 
-    digitized = np.digitize(log_mean_before, np.linspace(min(log_mean_before), 
-                                                         max(log_mean_before), nbins))
+	digitized = np.digitize(log_mean_before, np.linspace(min(log_mean_before), 
+														 max(log_mean_before), nbins))
 
-    log_mean_corr = []
-    var_corr = []
-    log_var_corr = []
-    for j in np.unique(digitized):
-        id_genes = np.where(digitized == j)[0]
-        if len(id_genes) > 1:
-            mean_corr.append(np.corrcoef(mean_before[id_genes], mean_after[id_genes])[0, 1])
-            log_mean_corr.append(np.corrcoef(log_mean_before[id_genes], log_mean_after[id_genes])[0, 1])
-            var_corr.append(np.corrcoef(var_before[id_genes], var_after[id_genes])[0, 1])
-            log_var_corr.append(np.corrcoef(log_var_before[id_genes], log_var_after[id_genes])[0, 1])
+	log_mean_corr = []
+	var_corr = []
+	log_var_corr = []
+	for j in np.unique(digitized):
+		id_genes = np.where(digitized == j)[0]
+		if len(id_genes) > 1:
+			mean_corr.append(np.corrcoef(mean_before[id_genes], mean_after[id_genes])[0, 1])
+			log_mean_corr.append(np.corrcoef(log_mean_before[id_genes], log_mean_after[id_genes])[0, 1])
+			var_corr.append(np.corrcoef(var_before[id_genes], var_after[id_genes])[0, 1])
+			log_var_corr.append(np.corrcoef(log_var_before[id_genes], log_var_after[id_genes])[0, 1])
 
-    # plotting
-    fig = plt.figure(figsize = (8*2, 6*2))
-    ax = fig.add_subplot(2, 2, 1)
-    ax.plot(range(len(mean_corr)), mean_corr)
-    ax.set_xlabel('gene group')
-    ax.set_ylabel('correlation of averages')
+	# plotting
+	fig = plt.figure(figsize = (8*2, 6*2))
+	ax = fig.add_subplot(2, 2, 1)
+	ax.plot(range(len(mean_corr)), mean_corr)
+	ax.set_xlabel('gene group')
+	ax.set_ylabel('correlation of averages')
 
-    ax = fig.add_subplot(2, 2, 2)
-    ax.plot(range(len(log_mean_corr)), log_mean_corr)
-    ax.set_xlabel('gene group')
-    ax.set_ylabel('correlation of log averages')
+	ax = fig.add_subplot(2, 2, 2)
+	ax.plot(range(len(log_mean_corr)), log_mean_corr)
+	ax.set_xlabel('gene group')
+	ax.set_ylabel('correlation of log averages')
 
-    ax = fig.add_subplot(2, 2, 3)
-    ax.plot(range(len(var_corr)), var_corr)
-    ax.set_xlabel('gene group')
-    ax.set_ylabel('correlation of variances')
+	ax = fig.add_subplot(2, 2, 3)
+	ax.plot(range(len(var_corr)), var_corr)
+	ax.set_xlabel('gene group')
+	ax.set_ylabel('correlation of variances')
 
-    ax = fig.add_subplot(2, 2, 4)
-    ax.plot(range(len(log_var_corr)), log_var_corr)
-    ax.set_xlabel('gene group')
-    ax.set_ylabel('correlation of log variances')
+	ax = fig.add_subplot(2, 2, 4)
+	ax.plot(range(len(log_var_corr)), log_var_corr)
+	ax.set_xlabel('gene group')
+	ax.set_ylabel('correlation of log variances')
 
-    if save_dir is not None:
-    	plt.savefig(save_dir)
+	if save_dir is not None:
+		plt.savefig(save_dir)
 
-    return mean_corr, log_mean_corr, var_corr, log_var_corr
+	return mean_corr, log_mean_corr, var_corr, log_var_corr
 
 
 def compare_statistics(raw_data, normalized_data, save_dir=None):
-    # raw and normalized data must have cells along the rows and genes along the columns
-    mean_before = np.asarray(np.mean(raw_data, axis = 0)).squeeze()
-    mean_after = np.asarray(np.mean(normalized_data, axis = 0)).squeeze()
+	# raw and normalized data must have cells along the rows and genes along the columns
+	mean_before = np.asarray(np.mean(raw_data, axis = 0)).squeeze()
+	mean_after = np.asarray(np.mean(normalized_data, axis = 0)).squeeze()
 
-    mean_corr = np.corrcoef(mean_before, mean_after)[0, 1]
-    log_mean_corr = np.corrcoef(np.log2(mean_before), np.log2(mean_after))[0, 1]
+	mean_corr = np.corrcoef(mean_before, mean_after)[0, 1]
+	log_mean_corr = np.corrcoef(np.log2(mean_before), np.log2(mean_after))[0, 1]
 
-    var_before = np.asarray(np.var(raw_data, axis = 0)).squeeze()
-    var_after = np.asarray(np.var(normalized_data, axis = 0)).squeeze()
+	var_before = np.asarray(np.var(raw_data, axis = 0)).squeeze()
+	var_after = np.asarray(np.var(normalized_data, axis = 0)).squeeze()
 
-    var_corr = np.corrcoef(var_before, var_after)[0, 1]
-    log_var_corr = np.corrcoef(np.log2(var_before), np.log2(var_after))[0, 1]
+	var_corr = np.corrcoef(var_before, var_after)[0, 1]
+	log_var_corr = np.corrcoef(np.log2(var_before), np.log2(var_after))[0, 1]
 
-    # plotting
-    fig = plt.figure(figsize = (8*2, 6*2))
-    ax = fig.add_subplot(2, 2, 1)
-    ax.scatter(mean_before, mean_after)
-    ax.set_xlabel('mean before normalization')
-    ax.set_ylabel('mean after normalization')
-    ax.set_title('Correlation = ' + str(mean_corr))
+	# plotting
+	fig = plt.figure(figsize = (8*2, 6*2))
+	ax = fig.add_subplot(2, 2, 1)
+	ax.scatter(mean_before, mean_after)
+	ax.set_xlabel('mean before normalization')
+	ax.set_ylabel('mean after normalization')
+	ax.set_title('Correlation = ' + str(mean_corr))
 
-    ax = fig.add_subplot(2, 2, 2)
-    ax.scatter(np.log2(mean_before), np.log2(mean_after))
-    ax.set_xlabel('log2 mean before normalization')
-    ax.set_ylabel('log2 mean after normalization')
-    ax.set_title('Correlation = ' + str(log_mean_corr))
+	ax = fig.add_subplot(2, 2, 2)
+	ax.scatter(np.log2(mean_before), np.log2(mean_after))
+	ax.set_xlabel('log2 mean before normalization')
+	ax.set_ylabel('log2 mean after normalization')
+	ax.set_title('Correlation = ' + str(log_mean_corr))
 
-    ax = fig.add_subplot(2, 2, 3)
-    ax.scatter(var_before, var_after)
-    ax.set_xlabel('variance before normalization')
-    ax.set_ylabel('variance after normalization')
-    ax.set_title('Correlation = ' + str(var_corr))
+	ax = fig.add_subplot(2, 2, 3)
+	ax.scatter(var_before, var_after)
+	ax.set_xlabel('variance before normalization')
+	ax.set_ylabel('variance after normalization')
+	ax.set_title('Correlation = ' + str(var_corr))
 
-    ax = fig.add_subplot(2, 2, 4)
-    ax.scatter(np.log2(var_before), np.log2(var_after))
-    ax.set_xlabel('log2 variance before normalization')
-    ax.set_ylabel('log2 variance after normalization')
-    ax.set_title('Correlation = ' + str(log_var_corr))
+	ax = fig.add_subplot(2, 2, 4)
+	ax.scatter(np.log2(var_before), np.log2(var_after))
+	ax.set_xlabel('log2 variance before normalization')
+	ax.set_ylabel('log2 variance after normalization')
+	ax.set_title('Correlation = ' + str(log_var_corr))
 
-    if save_dir is not None:
-    	plt.savefig(save_dir)
+	if save_dir is not None:
+		plt.savefig(save_dir)
 
-    return mean_corr, log_mean_corr, var_corr, log_var_corr
+	return mean_corr, log_mean_corr, var_corr, log_var_corr
 
 
 def corr_lib_size(raw_data, normalized_data):
-    # raw and normalized data must have cells along the rows and genes along the columns
-    lib_size = np.asarray(np.sum(raw_data, axis = 1)).squeeze()
-    corr_lib_size = [np.corrcoef(normalized_data[:, j], lib_size)[0, 1] for j in range(normalized_data.shape[1])]
-    corr_log2_lib_size = [np.corrcoef(normalized_data[:, j], np.log2(lib_size))[0, 1] for j in range(normalized_data.shape[1])]
+	# raw and normalized data must have cells along the rows and genes along the columns
+	lib_size = np.asarray(np.sum(raw_data, axis = 1)).squeeze()
+	corr_lib_size = [np.corrcoef(normalized_data[:, j], lib_size)[0, 1] for j in range(normalized_data.shape[1])]
+	corr_log2_lib_size = [np.corrcoef(normalized_data[:, j], np.log2(lib_size))[0, 1] for j in range(normalized_data.shape[1])]
 
-    return corr_lib_size, corr_log2_lib_size
+	return corr_lib_size, corr_log2_lib_size
 
 
 def downsample_raw_data(umis, split_prop, overlap_factor = 0.0, random_state_number = None):
-    if random_state_number is None:
-        random_state = np.random.RandomState()
-    else:
-        random_state = np.random.RandomState(random_state_number)
-    umis_X_disjoint = random_state.binomial(umis, data_split - overlap_factor)
-    umis_Y_disjoint = random_state.binomial(umis - umis_X_disjoint, (1 - data_split) / (1 - data_split + overlap_factor))
-    overlap_factor = umis - umis_X_disjoint - umis_Y_disjoint
-    umis_X = umis_X_disjoint + overlap_factor
-    umis_Y = umis_Y_disjoint + overlap_factor
+	random_state = np.random.RandomState() if random_state_number is None \
+										   else np.random.RandomState(random_state_number)
 
-    return sparse.csr_matrix(umis_X), sparse.csr_matrix(umis_Y)
+	umis_X_disjoint = random_state.binomial(umis, data_split - overlap_factor)
+	umis_Y_disjoint = random_state.binomial(umis - umis_X_disjoint, (1 - data_split) / (1 - data_split + overlap_factor))
+	overlap_factor = umis - umis_X_disjoint - umis_Y_disjoint
+	umis_X = umis_X_disjoint + overlap_factor
+	umis_Y = umis_Y_disjoint + overlap_factor
+
+	return sparse.csr_matrix(umis_X), sparse.csr_matrix(umis_Y)
 
 
 def co_embed(normalized_full_data, normalized_downsampled_data):
-    # combine data -- again assumes that cells are along the rows
-    combined_data = np.concatenate((normalized_full_data, normalized_downsampled_data))
-    # sample id
-    sample_id = [0]*normalized_full_data.shape[0] + [1]*normalized_downsampled_data.shape[0]
-    pca = PCA(n_components=200, svd_solver='randomized')
-    principalComponents = pca.fit_transform(combined_data)
-    umap_result = UMAP(n_neighbors=30, metric='euclidean', 
-                            random_state=7).fit_transform(principalComponents)
-    color_pallete = ['g', 'r']
-    file_names = ['full data', 'downsampled data']
-    fig = plt.figure(figsize = (8*3, 6*1))
-    ax = plt.add_subplot(1, 3, 1)
-    for j in np.unique(sample_id):
-        id_s = sample_id == j
-        ax.scatter(umap_result[id_s, 0], umap_result[id_s, 1], 
-                    s = 2, 
-                    c = color_pallete[j], 
-                    label = file_names[j]);
-    lgnd = plt.legend(loc='left', bbox_to_anchor= (1.01, 1.01), fontsize = 12, markerscale = 3);
-    ax.set_xlabel('UMAP-1');
-    ax.set_ylabel('UMAP-2');
-    ax.set_xticks([], [])
-    ax.set_yticks([], [])
-    for item in np.unique(sample_id):
-        ax = fig.add_subplot(1, 3, item + 2)
-        id_s = sample_id == j
-        ax.scatter(umap_result[:, 0], umap_result[:, 1], s = 0.1, c = 'k')
-        ax.scatter(umap_result[id_s, 0], umap_result[id_s, 1], s = 5, c = color_pallete[item]);
-        ax.set_xticks([], [])
-        ax.set_yticks([], [])
+	# combine data
+	combined_data = np.concatenate((normalized_full_data, normalized_downsampled_data))
 
-    return umap_result
+	# sample id
+	sample_id = [0]*normalized_full_data.shape[0] + [1]*normalized_downsampled_data.shape[0]
+	pca = PCA(n_components=200, svd_solver='randomized')
+	principalComponents = pca.fit_transform(combined_data)
+	umap_result = UMAP(n_neighbors=30, metric='euclidean', 
+							random_state=7).fit_transform(principalComponents)
+	color_pallete = ['g', 'r']
+	file_names = ['full data', 'downsampled data']
+
+	# plotting
+	fig = plt.figure(figsize = (8*3, 6*1))
+	ax = plt.add_subplot(1, 3, 1)
+	for j in np.unique(sample_id):
+		id_s = sample_id == j
+		ax.scatter(umap_result[id_s, 0], umap_result[id_s, 1], 
+					s = 2, 
+					c = color_pallete[j], 
+					label = file_names[j]);
+	lgnd = plt.legend(loc='left', bbox_to_anchor= (1.01, 1.01), fontsize = 12, markerscale = 3);
+	ax.set_xlabel('UMAP-1');
+	ax.set_ylabel('UMAP-2');
+	ax.set_xticks([], [])
+	ax.set_yticks([], [])
+	for item in np.unique(sample_id):
+		ax = fig.add_subplot(1, 3, item + 2)
+		id_s = sample_id == j
+		ax.scatter(umap_result[:, 0], umap_result[:, 1], s = 0.1, c = 'k')
+		ax.scatter(umap_result[id_s, 0], umap_result[id_s, 1], s = 5, c = color_pallete[item]);
+		ax.set_xticks([], [])
+		ax.set_yticks([], [])
+
+	return umap_result

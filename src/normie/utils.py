@@ -10,7 +10,7 @@ from glmpca.glmpca import glmpca
 
 def load_data(data_dir):
 	matrix_dir = data_dir
-	mat = scipy.io.mmread(glob.glob(directory+'/*.mtx')[0]).tocsr().T
+	mat = scipy.io.mmread(glob.glob(directory+'/*.mtx*')[0]).tocsr().T
 
 	genes_path = glob.glob(directory+'/*genes*')[0]
 	gene_names = pd.read_csv(genes_path, index_col=0, header=None, sep='\t').iloc[:, 0].tolist()
