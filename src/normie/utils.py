@@ -145,7 +145,7 @@ def run_normalization(data_df, method, kwargs=None, r_dir=None):
 
 		# write the dataframe as a mtx for R to load
 		input_file_path = r_dir+'tmp.mtx'
-		scipy.io.mmwrite(input_file_path, data_df.values.T)
+		scipy.io.mmwrite(input_file_path, scipy.sparse.csr_matrix(data_df.values.T))
 
 		os.system('RScript {} {} {}'.format(script_path, input_file_path, r_dir))
 
