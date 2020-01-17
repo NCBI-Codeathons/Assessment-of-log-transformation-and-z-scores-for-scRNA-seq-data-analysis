@@ -87,7 +87,7 @@ def run_scvi(data):
     return
 
 
-def run_normalization(data_dir, method, r_dir=None):
+def run_normalization(data_dir, method, kwargs=None, r_dir=None):
     supported_methods = ['median', 'median_log', 'median_log_z', 'median_log_lr', 
                          'glmpca', 'scvi', 'scran', 'sctransform', 'linnorm']
 
@@ -107,7 +107,10 @@ def run_normalization(data_dir, method, r_dir=None):
     if method in supported_methods[:-3]:
         # python method, load data and do work directly
         counts = load_data(data_dir)
-        normed_data = method_map[method](counts)
+        if kwargs is not None:
+        	normed_data = method_map[method](counts, **kwargs)
+        else:
+        	normed_data = method_map[method](counts)
     else:
     	# R method, feed data dir to Rscript
     	assert r_dir is not None, \
