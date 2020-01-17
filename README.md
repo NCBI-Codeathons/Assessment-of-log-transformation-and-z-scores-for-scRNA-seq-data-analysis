@@ -27,6 +27,7 @@ To assess the robustness of a normalization method, we first downsample the coun
 * scVI
 * scRAN
 * scTransform
+* Linnorm
 
 ## Datasets Used
 [Dropbox](https://www.dropbox.com/sh/4uk9bdtk5t8ud7z/AAAZBJmMAw6IPt_qcaLVcCtYa?dl=0)
@@ -36,4 +37,5 @@ To assess the robustness of a normalization method, we first downsample the coun
 We had no coffee.
 
 ## Lessons Learned
-Always a pain to set up environment for various methods.
+Lesson 1: Always a pain to set up environment for various methods.
+Lesson 2: Always a pain to run R code from Python and vice-versa.
