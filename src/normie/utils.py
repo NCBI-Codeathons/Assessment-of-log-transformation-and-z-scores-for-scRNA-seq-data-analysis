@@ -103,7 +103,7 @@ def run_scvi(data):
 	return
 
 
-def run_normalization(data_dir, method, kwargs=None, r_dir=None):
+def run_normalization(data_df, method, kwargs=None, r_dir=None):
 	supported_methods = ['median', 'median_log', 'median_log_z', 'median_log_lr', 
 						 'glmpca', 'scvi', 'scran', 'sctransform', 'linnorm']
 
@@ -122,8 +122,7 @@ def run_normalization(data_dir, method, kwargs=None, r_dir=None):
 
 	if method in supported_methods[:-3]:
 		# python method, load data and do work directly
-		counts = load_data(data_dir)
-		counts = clean_data(counts)
+		counts = data_df
 		if kwargs is not None:
 			normed_data = method_map[method](counts, **kwargs)
 		else:
@@ -136,20 +135,24 @@ def run_normalization(data_dir, method, kwargs=None, r_dir=None):
 		r_dir = os.path.expanduser(r_dir)
 		script_path = r_dir + method_map[method]
 
-		os.system('RScript {} {} {}'.format(script_path, data_dir, r_dir))
+		# write the dataframe as a mtx for R to load
+		input_file_path = r_dir+'tmp.mtx'
+		scipy.io.mmwrite(input_file_path, data_df.values.T)
 
-		barcodes, gene_names = load_indexes(data_dir)
+		os.system('RScript {} {} {}'.format(script_path, input_file_path, r_dir))
+
+		barcodes, gene_names = data_df.index, data_df.columns
 
 		# load the R output
 		if method == 'scran':
-			normed_data = io.mmread(r_dir + "_scran_normalized.mtx")
+			normed_data = io.mmread(r_dir + "_scran_normalized.mtx").tocsr().T
 			normed_data = pd.DataFrame(normed_data.todense(), index=barcodes, columns=gene_names)
 		elif method == 'sctransform':
-			normed_data = pd.read_feather(r_dir + "_sctransform_normalized")
+			normed_data = pd.read_feather(r_dir + "_sctransform_normalized").tocsr().T
 			normed_data = pd.DataFrame(normed_data.todense(), index=barcodes, columns=gene_names)
 		elif method == 'linnorm':
-			normed_data1 = io.mmread(r_dir + "_linnorm_with_dot_norm.mtx")
-			normed_data2 = io.mmread(r_dir + "_linnorm.mtx")
+			normed_data1 = io.mmread(r_dir + "_linnorm_with_dot_norm.mtx").tocsr().T
+			normed_data2 = io.mmread(r_dir + "_linnorm.mtx").tocsr().T
 			normed_data = {'with_dot_norm': pd.DataFrame(normed_data1.todense(), index=barcodes, columns=gene_names), 
 						   'without_dot_norm': pd.DataFrame(normed_data2.todense(), index=barcodes, columns=gene_names)}
 
