@@ -60,6 +60,7 @@ def load_indexes(data_dir):
 def run_median(counts):
 	ls = counts.sum(axis = 1)
 	norm_counts = counts.div(ls, axis=0).mul(np.median(ls), axis=0)
+	norm_counts = pd.DataFrame(norm_counts, index=counts.index, columns=counts.index)
 	
 	return norm_counts
 
@@ -68,6 +69,7 @@ def run_median_log(counts, pc=0.1):
 	ls = counts.sum(axis = 1)
 	norm_counts = counts.div(ls, axis=0).mul(np.median(ls), axis=0)
 	log_norm_counts = np.log2(norm_counts + pc) - np.log2(pc)
+	log_norm_counts = pd.DataFrame(log_norm_counts, index=counts.index, columns=counts.index)
 	
 	return log_norm_counts
 
@@ -77,6 +79,7 @@ def run_median_log_z(counts, pc=0.1):
 	norm_counts = counts.div(ls, axis=0).mul(np.median(ls), axis=0)
 	log_norm_counts = np.log2(norm_counts + pc) - np.log2(pc)
 	z_log_norm_counts = zscore(log_norm_counts)
+	z_log_norm_counts = pd.DataFrame(z_log_norm_counts, index=counts.index, columns=counts.index)
 	
 	return z_log_norm_counts
 
