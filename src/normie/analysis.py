@@ -1,10 +1,11 @@
 import os
 import sys
-import numpy as np
-import pandas as pd
 import scipy
 import random
 import umap
+import numpy as np
+import pandas as pd
+import statsmodels.api as sm
 from scipy import sparse
 from sklearn.decomposition import PCA
 
@@ -13,6 +14,9 @@ from matplotlib import pyplot as plt
 
 
 def correlation_in_gene_groups(raw_data, normalized_data, save_dir=None, nbins = 5):
+	# convert pandas dataframe to numpy array
+	raw_data, normalized_data = raw_data.values, normalized_data.values
+
 	# raw and normalized data must have cells along the rows and genes along the columns
 	mean_before = np.asarray(np.mean(raw_data, axis = 0)).squeeze()
 	log_mean_before = np.log2(np.asarray(np.mean(raw_data, axis = 0)).squeeze())
@@ -69,6 +73,9 @@ def correlation_in_gene_groups(raw_data, normalized_data, save_dir=None, nbins =
 
 
 def compare_statistics(raw_data, normalized_data, save_dir=None):
+	# convert pandas dataframe to numpy array
+	raw_data, normalized_data = raw_data.values, normalized_data.values
+
 	# raw and normalized data must have cells along the rows and genes along the columns
 	mean_before = np.asarray(np.mean(raw_data, axis = 0)).squeeze()
 	mean_after = np.asarray(np.mean(normalized_data, axis = 0)).squeeze()
@@ -115,6 +122,9 @@ def compare_statistics(raw_data, normalized_data, save_dir=None):
 
 
 def corr_lib_size(raw_data, normalized_data):
+	# convert pandas dataframe to numpy array
+	raw_data, normalized_data = raw_data.values, normalized_data.values
+
 	# raw and normalized data must have cells along the rows and genes along the columns
 	lib_size = np.asarray(np.sum(raw_data, axis = 1)).squeeze()
 	corr_lib_size = [np.corrcoef(normalized_data[:, j], lib_size)[0, 1] for j in range(normalized_data.shape[1])]
@@ -123,7 +133,10 @@ def corr_lib_size(raw_data, normalized_data):
 	return corr_lib_size, corr_log2_lib_size
 
 
-def downsample_raw_data(umis, split_prop, overlap_factor = 0.0, random_state_number = None):
+def downsample_raw_data(raw_data, split_prop, overlap_factor = 0.0, random_state_number = None):
+	# convert pandas dataframe to numpy array
+	umis = raw_data.values
+
 	random_state = np.random.RandomState() if random_state_number is None \
 										   else np.random.RandomState(random_state_number)
 
@@ -136,7 +149,10 @@ def downsample_raw_data(umis, split_prop, overlap_factor = 0.0, random_state_num
 	return sparse.csr_matrix(umis_X), sparse.csr_matrix(umis_Y)
 
 
-def co_embed(normalized_full_data, normalized_downsampled_data):
+def co_embed(normalized_full_data, normalized_downsampled_data, save_dir=None):
+	# convert pandas dataframe to numpy array
+	normalized_full_data, normalized_downsampled_data = normalized_full_data.values, normalized_downsampled_data.values
+
 	# combine data
 	combined_data = np.concatenate((normalized_full_data, normalized_downsampled_data))
 
@@ -171,4 +187,70 @@ def co_embed(normalized_full_data, normalized_downsampled_data):
 		ax.set_xticks([], [])
 		ax.set_yticks([], [])
 
+	if save_dir is not None:
+		plt.savefig(save_dir)
+
 	return umap_result
+
+
+def vst_hvg(count_data, n_top_genes = 50, span = 0.3):
+	x, y = np.mean(count_data, axis = 0), np.var(count_data, axis = 0)
+	id_non_const = (y != 0)
+
+	# fit a loess regression
+	w = sm.nonparametric.lowess(np.log10(y[id_non_const]), np.log10(x[id_non_const]), 
+								frac=span, return_sorted = False)
+
+	expected_variance = np.zeros(len(y))
+	expected_variance[id_non_const] = 10**w
+	for j in range(len(expected_variance)):
+		if expected_variance[j] > np.sqrt(count_data.shape[0]):
+			expected_variance[j] = np.sqrt(count_data.shape[0])
+
+	standardized_count = np.zeros(shape = count_data.shape)
+	for j in range(standardized_count.shape[1]):
+		if id_non_const[j]:
+			res =  (count_data[:, j] - x[j])/expected_variance[j]
+			standardized_count[:, j] = res
+		else:
+			standardized_count[:, j] = count_data[:, j]
+
+	vst_mean = x
+	vst_var = np.var(standardized_count, axis = 0)
+	gene_id = np.argsort(-1*vst_var)
+	top_gene_id = gene_id[0:n_top_genes]
+
+	return vst_mean, vst_var, top_gene_id
+
+
+def hvg_before_after(raw_data, normalized_full_data, normalized_downsampled_data, save_dir=None):
+	# convert pandas dataframe to numpy array
+	raw_data = raw_data.values
+	normalized_full_data = normalized_full_data.values
+	normalized_downsampled_data = normalized_downsampled_data.values
+
+	_, _, top_gene_id = vst_hvg(raw_data)
+	mean_full = np.log2(np.asarray(np.mean(normalized_full_data, axis = 0)).squeeze())
+	var_full = np.log2(np.asarray(np.var(normalized_full_data, axis = 0)).squeeze())
+	mean_ds = np.log2(np.asarray(np.mean(normalized_downsampled_data, axis = 0)).squeeze())
+	var_ds = np.log2(np.asarray(np.var(normalized_downsampled_data, axis = 0)).squeeze())
+
+	# plotting
+	fig = plt.figure(figsize = (8*2, 6*1))
+	ax = fig.add_subplot(1, 2, 1)
+	ax.scatter(mean_full, var_full, s = 2)
+	ax.scatter(mean_full[top_gene_id], var_full[top_gene_id], s = 2, c = 'r')
+	ax.set_title('normalized full data')
+	ax.set_xlabel('log mean (full data)')
+	ax.set_ylabel('log variance (full data)')
+
+	ax = fig.add_subplot(1, 2, 2)
+	ax.scatter(mean_ds, var_ds, s = 2)
+	ax.scatter(mean_ds[top_gene_id], var_ds[top_gene_id], s = 2, c = 'r')
+	ax.set_title('normalized downsampled data')
+	ax.set_xlabel('log mean (full data)')
+	ax.set_ylabel('log variance (full data)')
+
+	if save_dir is not None:
+		plt.savefig(save_dir)
+
