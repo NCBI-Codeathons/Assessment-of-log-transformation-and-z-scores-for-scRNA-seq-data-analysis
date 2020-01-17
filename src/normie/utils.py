@@ -20,7 +20,6 @@ def load_data(data_dir):
 	valid_bc = pd.read_csv(barcodes_path, header=None, sep='\t').iloc[:, 0].tolist()
 
 	# remove features not detected in all observations
-	mat = mat[valid_bc_idx, :]
 	data_df = pd.DataFrame(mat.todense(), index=valid_bc, columns=gene_names)
 	data_df = data_df.sort_index()
 
