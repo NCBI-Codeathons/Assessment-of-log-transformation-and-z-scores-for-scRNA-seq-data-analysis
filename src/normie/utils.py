@@ -28,6 +28,20 @@ def load_data(data_dir):
 	return data_df
 
 
+def clean_data(data_df):
+	# filter out 15-cell genes
+	gene_cell_counts = (data_df > 0).sum(axis=0)
+	use_genes = gene_cell_counts.index[gene_cell_counts > 15]
+	data_df = data_df.loc[:, use_genes]
+
+	# filter out 15-gene cells
+	cell_gene_counts = (data_df > 0).sum(axis=1)
+	use_cells = cell_gene_counts.index[cell_gene_counts > 15]
+	data_df = data_df.loc[use_cells, :]
+
+	return data_df
+
+
 def load_indexes(data_dir):
 	genes_path = glob.glob(directory+'/*genes*')[0]
 	gene_names = pd.read_csv(genes_path, index_col=0, header=None, sep='\t').iloc[:, 0].tolist()
