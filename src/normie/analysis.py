@@ -146,7 +146,10 @@ def downsample_raw_data(raw_data, data_split, overlap_factor = 0.0, random_state
 	umis_X = umis_X_disjoint + overlap_factor
 	umis_Y = umis_Y_disjoint + overlap_factor
 
-	return sparse.csr_matrix(umis_X), sparse.csr_matrix(umis_Y)
+	umis_X = pd.DataFrame(sparse.csr_matrix(umis_X).todense(), index=raw_data.index, columns=raw_data.columns)
+	umis_Y = pd.DataFrame(sparse.csr_matrix(umis_Y).todense(), index=raw_data.index, columns=raw_data.columns)
+
+	return umis_X, umis_Y
 
 
 def co_embed(normalized_full_data, normalized_downsampled_data, save_dir=None):
