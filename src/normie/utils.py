@@ -29,13 +29,15 @@ def load_data(data_dir):
 
 
 def clean_data(data_df):
+	binarized = (data_df > 0)
+
 	# filter out 15-cell genes
-	gene_cell_counts = (data_df > 0).sum(axis=0)
+	gene_cell_counts = binarized.sum(axis=0)
 	use_genes = gene_cell_counts.index[gene_cell_counts > 15]
 	data_df = data_df.loc[:, use_genes]
 
 	# filter out 15-gene cells
-	cell_gene_counts = (data_df > 0).sum(axis=1)
+	cell_gene_counts = binarized.sum(axis=1)
 	use_cells = cell_gene_counts.index[cell_gene_counts > 15]
 	data_df = data_df.loc[use_cells, :]
 
@@ -121,6 +123,7 @@ def run_normalization(data_dir, method, kwargs=None, r_dir=None):
 	if method in supported_methods[:-3]:
 		# python method, load data and do work directly
 		counts = load_data(data_dir)
+		counts = clean_data(counts)
 		if kwargs is not None:
 			normed_data = method_map[method](counts, **kwargs)
 		else:
