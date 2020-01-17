@@ -23,7 +23,7 @@ def adj_rand_index_plot(scores_vs_norm_method_dict):
 	plt.plot(splits_for_plot_forward_order,adj_rand_scores_method1)
 	plt.scatter(splits_for_plot_forward_order,adj_rand_scores_method1)
 
-	plt.axis([0.1, 0.9, 0, 1])
+	plt.axis([0.1, 1, 0, 1])
 	ax.set_xticklabels(splits_for_plot_reverse_order)
 	plt.xlabel('Downsampling proportion')
 	plt.ylabel('Adjusted rand score')
