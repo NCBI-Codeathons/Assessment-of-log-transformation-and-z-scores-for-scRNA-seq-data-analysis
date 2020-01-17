@@ -135,7 +135,7 @@ def corr_lib_size(raw_data, normalized_data):
 
 def downsample_raw_data(raw_data, data_split, overlap_factor = 0.0, random_state_number = None):
 	# convert pandas dataframe to numpy array
-	umis = raw_data.values
+	umis = raw_data.values.astype('int64')
 
 	random_state = np.random.RandomState() if random_state_number is None \
 										   else np.random.RandomState(random_state_number)
