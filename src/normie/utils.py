@@ -82,16 +82,19 @@ def run_median_log_z(counts, pc=0.1):
 
 
 def run_median_log_lr(counts, pc=0.1):
-	counts = counts.values
 	ls = counts.sum(axis = 1)
 	norm_counts = counts.div(ls, axis=0).mul(np.median(ls), axis=0)
 	log_norm_counts = np.log2(norm_counts + pc) - np.log2(pc)
+	log_norm_counts = log_norm_counts.values
+	ls = ls.values
 	
 	# fit linear regression to 
 	lr = LinearRegression()
 	log_ls = np.log2(ls + pc) - np.log2(pc)
 	lr.fit(log_ls, log_norm_counts)
 	lr_log_norm_counts = log_norm_counts - lr.predict(log_ls)
+
+	lr_log_norm_counts = pd.DataFrame(lr_log_norm_counts, index=counts.index, columns=counts.columns)
 	
 	return lr_log_norm_counts
 
