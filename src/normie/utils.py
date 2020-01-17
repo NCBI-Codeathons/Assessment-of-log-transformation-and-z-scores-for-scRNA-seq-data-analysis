@@ -153,14 +153,14 @@ def run_normalization(data_df, method, kwargs=None, r_dir=None):
 
 		# load the R output
 		if method == 'scran':
-			normed_data = io.mmread(r_dir + "_scran_normalized.mtx").tocsr().T
+			normed_data = scipy.io.mmread(r_dir + "_scran_normalized.mtx").tocsr().T
 			normed_data = pd.DataFrame(normed_data.todense(), index=barcodes, columns=gene_names)
 		elif method == 'sctransform':
 			normed_data = pd.read_feather(r_dir + "_sctransform_normalized").tocsr().T
 			normed_data = pd.DataFrame(normed_data.todense(), index=barcodes, columns=gene_names)
 		elif method == 'linnorm':
-			normed_data1 = io.mmread(r_dir + "_linnorm_with_dot_norm.mtx").tocsr().T
-			normed_data2 = io.mmread(r_dir + "_linnorm.mtx").tocsr().T
+			normed_data1 = scipy.io.mmread(r_dir + "_linnorm_with_dot_norm.mtx").tocsr().T
+			normed_data2 = scipy.io.mmread(r_dir + "_linnorm.mtx").tocsr().T
 			normed_data = {'with_dot_norm': pd.DataFrame(normed_data1.todense(), index=barcodes, columns=gene_names), 
 						   'without_dot_norm': pd.DataFrame(normed_data2.todense(), index=barcodes, columns=gene_names)}
 
